@@ -48,7 +48,7 @@
 
 <div id="overlay">
     <div class="info-box">
-        <h1 style="color:#003399">🚉 鄭州東站：心語服務</h1>
+        <h1 style="color:#003399">🚄 鄭州東站 🚄</h1>
         <p>現在你是鄭州東站的服務人員！</p>
         <p>來自全國各地的旅客會用<strong>方言拼音</strong>向你諮詢，你會聽得一頭霧水。</p>
         <p><strong>請點擊氣泡進行「筆談」</strong>，利用漢字跨越溝通障礙並給出正確引導！</p>
@@ -67,7 +67,7 @@
 </div>
 
 <div id="game-container">
-    <div class="header">🚄 鄭州東站：心語服務台</div>
+    <div class="header">🚄 鄭州東站 🚄</div>
     
     <div id="display-area">
         <div class="bubble" id="chat-bubble" onclick="revealHanzi()">
@@ -84,43 +84,63 @@
     // 【在這裡存放你的數據】
     const quizPool = [
         { 
-            pinyin: "Ci-ka u-sa-diu-ve va?", 
-            hanzi: "洗手間勒啥地方？", 
-            dialect: "吳語 (上海話)",
+            pinyin: "Da-su-ke le' la' ha li ta'", 
+            hanzi: "汏(洗)手間勒何里𡍲？", 
+            dialect: "吳語 (上海)",
             options: [
                 { text: "請直走左轉，那裡有洗手間", isCorrect: true },
-                { text: "進站請先取票", isCorrect: false },
+                { text: "請右轉直走到底，那裡有地鐵站", isCorrect: false },
                 { text: "遺失物領取請去二樓", isCorrect: false }
             ]
         },
         { 
-            pinyin: "Ngo5 soeng2 hai2 ni1 dou6 maai5 piu3.", 
-            hanzi: "我想喺呢度買飛（買票）。", 
-            dialect: "粵語 (廣東話)",
+            pinyin: "Ngo5 soeng2 hai2 ni1 dou6 maai5 piu3", 
+            hanzi: "我想喺呢度買飛(票)。", 
+            dialect: "粵語 (廣州)",
             options: [
-                { text: "出站請走右側出口", isCorrect: false },
+                { text: "請由東正門出去轉，那裏有巴士站", isCorrect: false },
                 { text: "本櫃台不售票，請去機器購票", isCorrect: true },
-                { text: "地鐵換乘請往下走", isCorrect: false }
+                { text: "地鐵換乘請右轉，再直走到底", isCorrect: false }
             ]
         },
         { 
-            pinyin: "O-yau po-ging, bao bei-yan tau-jo!", 
-            hanzi: "我要報警，包俾人偷咗！", 
-            dialect: "粵語 (廣東話)",
+            pinyin: "автобус җан зэли", 
+            hanzi: "巴士(Avtobus)站(在)哪裡？", 
+            dialect: "東干語 (中亞/吉爾吉斯)",
             options: [
-                { text: "請立刻聯繫站內警務室", isCorrect: true },
-                { text: "去月台請走一號電梯", isCorrect: false },
-                { text: "洗手間在售票廳後方", isCorrect: false }
+                { text: "巴士請由東正門出去轉", isCorrect: true },
+                { text: "去月台請搭乘一號電梯", isCorrect: false },
+                { text: "洗手間在售票廳斜後方", isCorrect: false }
             ]
         },
         { 
-            pinyin: "Chhiáng-mng phiò chi̍t-tiunn lōa-choe chîⁿ?", 
+            pinyin: "Chhiáng-mng phiò chi̍t-tiunn lōa-choe chîⁿ", 
             hanzi: "請問票一張偌濟錢？", 
-            dialect: "閩南語 (泉州/廈門)",
+            dialect: "閩南語 (廈門)",
             options: [
                 { text: "計程車請往西廣場走", isCorrect: false },
-                { text: "這張票是免費領取的", isCorrect: false },
-                { text: "二等座一張票是 150 元", isCorrect: true }
+                { text: "抱歉，這裡不賣地鐵票", isCorrect: false },
+                { text: "一張票是 150 元", isCorrect: true }
+            ]
+        },
+        { 
+            pinyin: "vzi dai pɔ nang tʰau au", 
+            hanzi: "鈔票袋畀人偷哩！", 
+            dialect: "溫州語 (溫州)",
+            options: [
+                { text: "行李寄放的密碼一定要熟記", isCorrect: false },
+                { text: "抱歉這裡沒有飲水機", isCorrect: false },
+                { text: "這裡馬上連絡公安", isCorrect: true }
+            ]
+        },
+        { 
+            pinyin: "Ngo iau mai qi Fung-sang go piau", 
+            hanzi: "我要買去豐城的票", 
+            dialect: "贛語 (豐城)",
+            options: [
+                { text: "豐山的票在這裡", isCorrect: false },
+                { text: "豐城的票在這裡", isCorrect: true },
+                { text: "豐昌的票在這裡", isCorrect: false }
             ]
         }
     ];
