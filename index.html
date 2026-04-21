@@ -2,118 +2,165 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>鄭州東站：神州通語 (文字版)</title>
+    <title>高鐵鄭州東站：神州通語</title>
     <style>
-        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: #cfd8dc; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: #b0bec5; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        #game-box { width: 900px; height: 600px; background: #fff; border-radius: 8px; box-shadow: 0 15px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column; border: 4px solid #003399; }
-        
-        /* 頂部標題 */
-        .header { background: #003399; color: white; padding: 20px; font-size: 1.4rem; font-weight: bold; letter-spacing: 2px; text-align: center; }
+        /* 說明與獎勵層 */
+        #overlay, #win-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); z-index: 1000; display: flex; 
+            justify-content: center; align-items: center; text-align: center; color: white; 
+        }
+        .info-box { background: #fff; color: #333; padding: 40px; border-radius: 20px; border: 5px solid #003399; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        /* 中間對話區 */
-        #display-area { flex: 1; padding: 40px; background: #f9f9f9; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        /* 遊戲主容器 */
+        #game-container { position: relative; width: 1000px; height: 650px; background: #fff; border: 8px solid #003399; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+        
+        .header { background: #003399; color: white; padding: 20px; font-size: 1.6rem; text-align: center; font-weight: bold; }
+
+        #display-area { flex: 1; padding: 40px; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         
         /* 旅客對話氣泡 */
         .bubble { 
-            background: #fff; border: 3px solid #333; padding: 30px; border-radius: 15px; 
-            width: 80%; min-height: 100px; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: #d32f2f; text-align: center; cursor: pointer; transition: 0.3s;
-            box-shadow: 8px 8px 0 #ddd;
+            background: #fff; border: 4px solid #333; padding: 35px; border-radius: 20px; 
+            width: 85%; min-height: 120px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; color: #d32f2f; text-align: center; cursor: pointer; transition: 0.3s;
+            box-shadow: 10px 10px 0 #cfd8dc;
         }
-        .bubble:hover { transform: translateY(-5px); box-shadow: 12px 12px 0 #ccc; border-color: #003399; }
+        .bubble:hover { transform: scale(1.02); border-color: #003399; }
         
-        .hint-text { margin-top: 20px; color: #78909c; font-size: 1rem; font-style: italic; }
+        .hint-text { margin-top: 25px; color: #546e7a; font-size: 1.2rem; font-weight: bold; }
 
-        /* 下方按鈕區 */
-        .action-bar { background: #eeeeee; padding: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        /* 動態操作區 */
+        .action-area { height: 160px; background: #eceff1; padding: 25px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; border-top: 3px solid #003399; }
         .reply-btn { 
-            padding: 20px; font-size: 1.3rem; border: 2px solid #003399; background: #fff; color: #003399;
-            cursor: pointer; font-weight: bold; transition: 0.2s; border-radius: 5px;
+            padding: 10px; font-size: 1.3rem; border: 3px solid #003399; background: #fff; color: #003399;
+            cursor: pointer; font-weight: bold; transition: 0.2s; border-radius: 10px;
         }
         .reply-btn:hover:not(:disabled) { background: #003399; color: #fff; }
         .reply-btn:disabled { border-color: #bbb; color: #bbb; cursor: not-allowed; }
 
-        /* 成功/失敗覆蓋層 */
-        #feedback { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
-        .feedback-title { font-size: 3rem; font-weight: bold; margin-bottom: 20px; }
+        .btn-start { padding: 15px 40px; font-size: 1.5rem; background: #003399; color: white; border: none; border-radius: 50px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<div id="game-box">
-    <div class="header">🚉 鄭州東站：心語服務台 (漢語方言筆談挑戰)</div>
-    
-    <div id="display-area">
-        <div id="feedback">
-            <div class="feedback-title" id="fb-text">正確</div>
-            <button class="reply-btn" onclick="nextLevel()">接待下一位旅客</button>
-        </div>
-
-        <div class="bubble" id="chat-bubble" onclick="revealHanzi()">
-            <span id="pinyin-display">載入中...</span>
-        </div>
-        <div class="hint-text" id="status-hint">旅客正在說話，你聽的一頭霧水... (點擊對話氣泡請求「筆談」)</div>
-    </div>
-
-    <div class="action-bar">
-        <button class="reply-btn action-opt" onclick="handleReply('廁所')" disabled>請直走左轉，那裡有洗手間</button>
-        <button class="reply-btn action-opt" onclick="handleReply('買票')" disabled>自動售票機在您身後</button>
-        <button class="reply-btn action-opt" onclick="handleReply('報警')" disabled>請稍等，我立刻聯繫站內警務室</button>
+<div id="overlay">
+    <div class="info-box">
+        <h1 style="color:#003399">🚉 鄭州東站：心語服務</h1>
+        <p>現在你是鄭州東站的服務人員！</p>
+        <p>來自全國各地的旅客會用<strong>方言拼音</strong>向你諮詢，你會聽得一頭霧水。</p>
+        <p><strong>請點擊氣泡進行「筆談」</strong>，利用漢字跨越溝通障礙並給出正確引導！</p>
+        <button class="btn-start" onclick="startGame()">開始服務旅客</button>
     </div>
 </div>
 
+<div id="win-screen" style="display:none;">
+    <div class="info-box">
+        <h1 style="color:#2e7d32">🏆 溝通大師！</h1>
+        <p>你成功服務了所有旅客。</p>
+        <p style="font-size: 1.1rem; line-height: 1.6;">即使方言「南腔北調」如外語般難懂，但只要<strong>書同文</strong>，中華文化便能萬里無礙。</p>
+        <div style="font-size: 5rem; margin: 20px;">🚄📜</div>
+        <button class="btn-start" onclick="location.reload()">重新值班</button>
+    </div>
+</div>
+
+<div id="game-container">
+    <div class="header">🚄 鄭州東站：心語服務台</div>
+    
+    <div id="display-area">
+        <div class="bubble" id="chat-bubble" onclick="revealHanzi()">
+            <span id="pinyin-display">準備中...</span>
+        </div>
+        <div class="hint-text" id="status-hint">旅客已抵達服務台...</div>
+    </div>
+
+    <div class="action-area" id="btn-group">
+        </div>
+</div>
+
 <script>
-    // 【這裡修改例句】
+    // 【在這裡存放你的數據】
     const quizPool = [
-        { 
-            pinyin: "Chhiáng-mng phiò chi̍t-tiunn lōa-choe chîⁿ?", 
-            hanzi: "請問票一張偌濟錢？", 
-            answer: "買票",
-            dialect: "閩南語 (Hokkien)"
-        },
-        { 
-            pinyin: "Ngo5 soeng2 hai2 ni1 dou6 maai5 piu3.", 
-            hanzi: "我想喺呢度買飛。", 
-            answer: "買票",
-            dialect: "粵語 (Cantonese)"
-        },
         { 
             pinyin: "Ci-ka u-sa-diu-ve va?", 
             hanzi: "洗手間勒啥地方？", 
-            answer: "廁所",
-            dialect: "吳語 (Shanghainese)"
+            dialect: "吳語 (上海話)",
+            options: [
+                { text: "請直走左轉，那裡有洗手間", isCorrect: true },
+                { text: "進站請先取票", isCorrect: false },
+                { text: "遺失物領取請去二樓", isCorrect: false }
+            ]
         },
         { 
-            pinyin: "O-yau po-ging, ngo-ge bao bei-yan tau-jo!", 
-            hanzi: "我要報警，我個包俾人偷咗！", 
-            answer: "報警",
-            dialect: "粵語 (Cantonese)"
+            pinyin: "Ngo5 soeng2 hai2 ni1 dou6 maai5 piu3.", 
+            hanzi: "我想喺呢度買飛（買票）。", 
+            dialect: "粵語 (廣東話)",
+            options: [
+                { text: "出站請走右側出口", isCorrect: false },
+                { text: "本櫃台不售票，請去機器購票", isCorrect: true },
+                { text: "地鐵換乘請往下走", isCorrect: false }
+            ]
+        },
+        { 
+            pinyin: "O-yau po-ging, bao bei-yan tau-jo!", 
+            hanzi: "我要報警，包俾人偷咗！", 
+            dialect: "粵語 (廣東話)",
+            options: [
+                { text: "請立刻聯繫站內警務室", isCorrect: true },
+                { text: "去月台請走一號電梯", isCorrect: false },
+                { text: "洗手間在售票廳後方", isCorrect: false }
+            ]
+        },
+        { 
+            pinyin: "Chhiáng-mng phiò chi̍t-tiunn lōa-choe chîⁿ?", 
+            hanzi: "請問票一張偌濟錢？", 
+            dialect: "閩南語 (泉州/廈門)",
+            options: [
+                { text: "計程車請往西廣場走", isCorrect: false },
+                { text: "這張票是免費領取的", isCorrect: false },
+                { text: "二等座一張票是 150 元", isCorrect: true }
+            ]
         }
     ];
 
     let currentIdx = 0;
     let isRevealed = false;
 
+    function startGame() {
+        document.getElementById('overlay').style.display = 'none';
+        initLevel();
+    }
+
     function initLevel() {
         if (currentIdx >= quizPool.length) {
-            document.getElementById('display-area').innerHTML = "<h1>您完美解決了所有旅客的問題！<br>充分展現了「書同文」的跨地域溝通能力。</h1>";
+            document.getElementById('win-screen').style.display = 'flex';
             return;
         }
 
         isRevealed = false;
         const data = quizPool[currentIdx];
         
-        // 顯示拼音
         document.getElementById('pinyin-display').innerText = data.pinyin;
         document.getElementById('pinyin-display').style.color = "#d32f2f";
-        document.getElementById('status-hint').innerText = `一名來自遠方的旅客發出了聲音... (點擊氣泡請求「筆談」)`;
+        document.getElementById('status-hint').innerText = "🔊 旅客諮詢中... (聽不懂，請點擊氣泡進行筆談)";
         
-        // 隱藏反饋層
-        document.getElementById('feedback').style.display = 'none';
+        // 動態生成該題專屬選項
+        const btnGroup = document.getElementById('btn-group');
+        btnGroup.innerHTML = '';
         
-        // 禁用按鈕
-        toggleBtns(true);
+        // 選項隨機打亂
+        const shuffledOptions = [...data.options].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'reply-btn';
+            btn.innerText = opt.text;
+            btn.disabled = true; // 筆談前不能選
+            btn.onclick = () => checkAnswer(opt.isCorrect);
+            btnGroup.appendChild(btn);
+        });
     }
 
     function revealHanzi() {
@@ -121,43 +168,24 @@
         isRevealed = true;
         
         const data = quizPool[currentIdx];
-        // 轉化為漢字
         document.getElementById('pinyin-display').innerText = data.hanzi;
         document.getElementById('pinyin-display').style.color = "#003399";
-        document.getElementById('status-hint').innerText = `透過筆談，文字揭示了意圖！ (這是：${data.dialect})`;
+        document.getElementById('status-hint').innerText = `【筆談：${data.dialect}】現在你看懂旅客的意思了！`;
         
-        // 啟用按鈕
-        toggleBtns(false);
+        // 啟用所有按鈕
+        const btns = document.querySelectorAll('.reply-btn');
+        btns.forEach(b => b.disabled = false);
     }
 
-    function handleReply(type) {
-        const correctType = quizPool[currentIdx].answer;
-        const fb = document.getElementById('feedback');
-        const fbText = document.getElementById('fb-text');
-        
-        fb.style.display = 'flex';
-        
-        if (type === correctType) {
-            fbText.innerText = "√ 回答正確";
-            fbText.style.color = "#2e7d32";
+    function checkAnswer(isCorrect) {
+        if (isCorrect) {
+            currentIdx++;
+            alert("回答正確！旅客滿意地離開了。");
+            initLevel();
         } else {
-            fbText.innerText = "× 旅客一臉困惑";
-            fbText.style.color = "#c62828";
+            alert("答錯了！旅客露出了困惑的表情，請再看一次筆談內容。");
         }
     }
-
-    function nextLevel() {
-        currentIdx++;
-        initLevel();
-    }
-
-    function toggleBtns(disabled) {
-        const btns = document.querySelectorAll('.action-opt');
-        btns.forEach(b => b.disabled = disabled);
-    }
-
-    // 啟動遊戲
-    initLevel();
 </script>
 
 </body>
