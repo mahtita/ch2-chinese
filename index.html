@@ -177,7 +177,7 @@
             const btn = document.createElement('button');
             btn.className = 'reply-btn';
             btn.innerText = opt.text;
-            btn.disabled = true; // 筆談前不能選
+            btn.disabled = false; // 筆談前不能選
             btn.onclick = () => checkAnswer(opt.isCorrect);
             btnGroup.appendChild(btn);
         });
@@ -194,7 +194,6 @@
         
         // 啟用所有按鈕
         const btns = document.querySelectorAll('.reply-btn');
-        btns.forEach(b => b.disabled = false);
     }
 
     function checkAnswer(isCorrect) {
